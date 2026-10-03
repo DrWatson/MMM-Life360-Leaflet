@@ -73,12 +73,16 @@ Requires a working MagicMirror² installation (module API minimum 2.20.0) and No
    },
    ```
 
-   Get the circle ID from the `id` field of your chosen circle in this Postman response:
+   To find your circle ID using Chrome or Microsoft Edge Developer Tools:
 
-   ```text
-   GET https://api-cloudfront.life360.com/v4/circles
-   Authorization: Bearer YOUR_ACCESS_TOKEN
-   ```
+   - Sign in to [Life360](https://life360.com/login) with your own account.
+   - Press **F12** or **Ctrl+Shift+I**, open **Network**, enable **Preserve log**, and select **Fetch/XHR**.
+   - Refresh the page with Developer Tools open. If a circle/map view is available, open it. Enter `circles` in the Network filter.
+   - Select a successful request whose URL ends in `/circles` (possibly followed by query parameters). Open **Preview** or **Response**, find your circle by its `name`, and copy that circle's `id` from the `circles` array. Do not copy a member's ID or a circle invitation code.
+   - You can also find the circle ID in a members request URL such as `/v3/circles/YOUR-CIRCLE-ID/members`: copy the value between `/circles/` and `/members`. If you belong to multiple circles, confirm that the request belongs to the circle you want.
+   - Replace `PASTE_YOUR_CIRCLE_ID` in the module configuration above with the copied value, keeping the quotation marks.
+
+   This method works only if the website makes circle-related API requests. An account/billing-only page may not make them. If none appear, the circle ID cannot be obtained through this Network view; you will need an authenticated circles API response instead. Avoid sharing network exports or screenshots containing access tokens or private member data.
 
 4. Restart MagicMirror using your usual method. If PM2 manages it, use `pm2 list` to find its name, then `pm2 restart YOUR_PROCESS_NAME`. If you launch it manually, stop it and run your normal start command again.
 
