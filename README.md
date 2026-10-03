@@ -1,10 +1,10 @@
 # MMM-Life360-Leaflet
 
-This module uses [Leaflet](https://leafletjs.com/) to display its interactive map, with OpenStreetMap tiles by default.
-
 A MagicMirror² module for a Raspberry Pi that displays every member of one Life360 circle on a map, with profile avatars, names, battery percentages, charging state, and the age of each location report.
 
 **Refreshes every 60 seconds by default.** It reads the latest server data; it does not force members' phones to produce a new GPS fix. Members without shared coordinates remain in the list. Nearby map markers cluster together; select a numbered marker or a member card to reveal a person.
+
+This module uses [Leaflet](https://leafletjs.com/) to display its interactive map, with OpenStreetMap tiles by default.
 
 ## Sample screenshots
 
