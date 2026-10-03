@@ -31,7 +31,7 @@ Requires a working MagicMirror² installation (module API minimum 2.20.0) and No
    nano ~/.config/MMM-Life360-Leaflet/credentials.json
    ```
 
-   Paste this JSON, replacing the placeholder with the **access_token** you obtained through your own normal Life360 browser login:
+   Paste this JSON, replacing the placeholder with your Life360 access token. Follow [Get your Life360 access token](#get-your-life360-access-token) below to obtain it:
 
    ```json
    {
@@ -81,6 +81,27 @@ Requires a working MagicMirror² installation (module API minimum 2.20.0) and No
    ```
 
 4. Restart MagicMirror using your usual method. If PM2 manages it, use `pm2 list` to find its name, then `pm2 restart YOUR_PROCESS_NAME`. If you launch it manually, stop it and run your normal start command again.
+
+## Get your Life360 access token
+
+Use Chrome or Microsoft Edge on your computer:
+
+1. Visit [Life360 sign-in](https://life360.com/login) and sign in to your own account. Complete any verification code or browser challenge normally.
+2. Press **F12** or **Ctrl+Shift+I** to open Developer Tools.
+3. Select **Application** (it may be under the **»** overflow menu).
+4. Expand **Storage → Cookies**, then select the Life360 website entry.
+5. Find **LIFE360_AUTH_TOKEN**. Select it and copy its complete **Value**. This cookie-based method is documented by the [community Life360 integration](https://github.com/pnbruckner/ha-life360#access-token); it is not an official developer-token service.
+6. On your Pi, paste only the token value into the `accessToken` field in `~/.config/MMM-Life360-Leaflet/credentials.json`, replacing the placeholder. Keep the JSON quotation marks. Do not include the cookie name or a `Bearer ` prefix.
+
+If the cookie is absent, you can inspect the login traffic instead:
+
+1. Open Developer Tools **before signing in**, select **Network**, and enable **Preserve log**.
+2. Complete sign-in, then look for a successful authentication request (often named `token`). If its **Response** contains an `access_token` field, copy that field's value only.
+3. Alternatively, if a successful Life360 API request has an **Authorization: Bearer …** request header, copy only the value after `Bearer `.
+
+Life360 can change its login flow. If neither location exposes a token, this method is unavailable for that session; do not substitute a verification code, refresh token, or Basic/client token. A captured token can still be rejected by the API; see Troubleshooting for 401, 403, and browser-challenge responses.
+
+Treat this token like a password: it can grant access to your circle's information. Do not commit it to GitHub or share screenshots, network exports, or copied requests containing it. The module does not automatically renew expired tokens; obtain a fresh one and replace the private file when needed.
 
 ## What appears
 
