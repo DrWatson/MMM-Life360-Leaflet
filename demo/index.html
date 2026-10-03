@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Life360 Map — sample preview</title>
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="../vendor/markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="../MMM-Life360Map.css">
+  <style>
+    body { margin: 0; padding: 36px 20px; background: #030706; color: #eef5f1; font-family: Arial,sans-serif; }
+    main { width: 520px; max-width: 100%; margin: auto; }
+    .demo-label { margin: 0 0 25px; color: #8a9f93; font-size: 11px; letter-spacing: .5px; }
+    .demo-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+    .demo-controls button { color: #c6ded0; background: #15241d; border: 1px solid #395245; border-radius: 7px; padding: 8px 12px; cursor: pointer; }
+    .demo-layout { display: flex; align-items: center; gap: 10px; margin-top: 18px; color: #a7b8b0; font-size: 12px; }
+    .demo-layout select { color: #c6ded0; background: #15241d; border: 1px solid #395245; border-radius: 7px; padding: 6px 10px; }
+    .demo-note { font-size: 12px; line-height: 1.7; color: #81998a; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="demo-label">MMM-LIFE360MAP &nbsp; / &nbsp; FICTIONAL SAMPLE DATA</p>
+    <div id="module"></div>
+    <div class="demo-controls" id="visibility-controls">
+      <label><input type="checkbox" data-option="showFamilyHeading" checked> Family heading</label>
+      <label><input type="checkbox" data-option="showSyncStatus" checked> Sync status</label>
+      <label><input type="checkbox" data-option="showRefreshFooter" checked> Refresh footer</label>
+      <label><input type="checkbox" data-option="showMemberCount" checked> Member count</label>
+      <label><input type="checkbox" data-option="showTitle" checked> Title</label>
+    </div>
+    <label class="demo-layout">Cards position
+      <select id="cards-position">
+        <option value="below">Below</option>
+        <option value="above">Above</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+      </select>
+    </label>
+    <div class="demo-controls">
+      <label>Speed units <select id="speed-units"><option value="mph">mph</option><option value="kmh">km/h</option></select></label>
+      <label>Avatar limit <select id="avatar-limit"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></label>
+      <button id="normal">Sample circle</button>
+      <button id="error">Connection error</button>
+      <button id="empty">No shared locations</button>
+      <button id="together-three">3 at same spot</button>
+      <button id="together-four">4 at same spot</button>
+    </div>
+    <p class="demo-note">Select a person to locate them. Select a numbered marker to expand a group.<br>This preview uses fictional people and public places, and makes no Life360 requests.</p>
+  </main>
+  <script src="../vendor/leaflet/leaflet.js"></script>
+  <script src="../vendor/markercluster/leaflet.markercluster.js"></script>
+  <script>window.Module = { register(name, definition) { window.moduleDefinition = definition; } };</script>
+  <script src="../MMM-Life360Map.js"></script>
+  <script src="demo.js"></script>
+</body>
+</html>
