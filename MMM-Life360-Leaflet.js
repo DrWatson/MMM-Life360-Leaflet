@@ -1,5 +1,5 @@
 /* global Module, L */
-Module.register("MMM-Life360Map", {
+Module.register("MMM-Life360-Leaflet", {
   requiresVersion: "2.20.0",
   defaults: {
     circleId: "",
@@ -34,7 +34,7 @@ Module.register("MMM-Life360Map", {
   getStyles() {
     return [this.file("vendor/leaflet/leaflet.css"),
       this.file("vendor/markercluster/MarkerCluster.css"),
-      this.file("MMM-Life360Map.css")];
+      this.file("MMM-Life360-Leaflet.css")];
   },
 
   start() {

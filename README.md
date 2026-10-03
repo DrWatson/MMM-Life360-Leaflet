@@ -1,4 +1,4 @@
-# MMM-Life360Map
+# MMM-Life360-Leaflet
 
 A MagicMirror² module for a Raspberry Pi that displays every member of one Life360 circle on a map, with profile avatars, names, battery percentages, charging state, and the age of each location report.
 
@@ -8,20 +8,27 @@ A MagicMirror² module for a Raspberry Pi that displays every member of one Life
 
 Requires a working MagicMirror² installation (module API minimum 2.20.0) and Node.js 18 or newer. Use the Node version supported by your installed MagicMirror release. Leaflet and MarkerCluster are bundled in `vendor/`, with their licenses: **no npm install is needed**.
 
-1. Copy `MMM-Life360Map.zip` to your Pi's home folder using your usual file transfer method. Open a terminal on the Pi and run:
+1. Install the module with Git:
 
    ```bash
-   unzip ~/MMM-Life360Map.zip -d ~/MagicMirror/modules/
+   cd ~/MagicMirror/modules
+   git clone https://github.com/DrWatson/MMM-Life360-Leaflet.git
    ```
 
-   The result must be `~/MagicMirror/modules/MMM-Life360Map/MMM-Life360Map.js` (not an extra nested folder). Adjust `~/MagicMirror` if your installation lives elsewhere.
+   Alternatively, copy `MMM-Life360-Leaflet.zip` to your Pi's home folder and extract it:
+
+   ```bash
+   unzip ~/MMM-Life360-Leaflet.zip -d ~/MagicMirror/modules/
+   ```
+
+   The result must be `~/MagicMirror/modules/MMM-Life360-Leaflet/MMM-Life360-Leaflet.js` (not an extra nested folder). Adjust `~/MagicMirror` if your installation lives elsewhere.
 
 2. Create the token file outside MagicMirror's web-served folders:
 
    ```bash
-   mkdir -p ~/.config/MMM-Life360Map
-   chmod 700 ~/.config/MMM-Life360Map
-   nano ~/.config/MMM-Life360Map/credentials.json
+   mkdir -p ~/.config/MMM-Life360-Leaflet
+   chmod 700 ~/.config/MMM-Life360-Leaflet
+   nano ~/.config/MMM-Life360-Leaflet/credentials.json
    ```
 
    Paste this JSON, replacing the placeholder with the **access_token** you obtained through your own normal Life360 browser login:
@@ -35,16 +42,16 @@ Requires a working MagicMirror² installation (module API minimum 2.20.0) and No
    Save with Ctrl+O, Enter, then exit with Ctrl+X. Restrict the file:
 
    ```bash
-   chmod 600 ~/.config/MMM-Life360Map/credentials.json
+   chmod 600 ~/.config/MMM-Life360-Leaflet/credentials.json
    ```
 
-   Do not use the old Basic/client token. Do not put the personal token in MagicMirror's `config.js` or the module folder. The helper reads this private file on each API request, so replacing an expired token does not require a restart (any active retry delay still applies). Create it as the same Linux user that runs MagicMirror. If you use a different service user, its home directory is the one that matters.
+   Use a personal access token, not a Basic/client token. Do not put the personal token in MagicMirror's `config.js` or the module folder. The helper reads this private file on each API request, so replacing an expired token does not require a restart (any active retry delay still applies). Create it as the same Linux user that runs MagicMirror. If you use a different service user, its home directory is the one that matters.
 
 3. Open `~/MagicMirror/config/config.js`. Inside its existing `modules: [ ... ]` array, add this object, using commas to separate it from adjacent module objects:
 
    ```js
    {
-     module: "MMM-Life360Map",
+     module: "MMM-Life360-Leaflet",
      position: "top_right",
      config: {
        circleId: "PASTE_YOUR_CIRCLE_ID",
@@ -124,10 +131,10 @@ mapHeight: "450px",
 updateInterval: 5000,
 ```
 
-Use `"right"`, `"above"`, or `"below"` to select another position, then restart MagicMirror. Existing configurations default to cards below the map. For a narrow display, add this to your configured MagicMirror custom CSS file (its location depends on your MagicMirror version):
+Use `"right"`, `"above"`, or `"below"` to select another position, then restart MagicMirror. Cards appear below the map by default. For a narrow display, add this to your configured MagicMirror custom CSS file (its location depends on your MagicMirror version):
 
 ```css
-.MMM-Life360Map .l360-members { grid-template-columns: 1fr; }
+.MMM-Life360-Leaflet .l360-members { grid-template-columns: 1fr; }
 ```
 
 The five heading/status visibility options are `showFamilyHeading`, `showSyncStatus`, `showRefreshFooter`, `showMemberCount`, and `showTitle`. Set each to `false` to hide its element, or `true` to show it. They are independent and all default to `true`. Hiding all heading elements removes the empty heading row and its spacing. These five options do not affect member-card details, map attribution, or polling.
@@ -166,7 +173,7 @@ Open `http://127.0.0.1:8765/demo/` in a browser. It needs internet for map tiles
 
 Run the included backend and lifecycle tests with `npm test` or `node --test test/*.test.js`. Tests use synthetic data; no account credentials or live Life360 API calls are needed. The standalone demo checks the same frontend used by the module; it is not a full MagicMirror-on-Pi integration test.
 
-Build validation: all 25 automated tests passed, including admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatars (crown visibility updated in v1.4.2), mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
+Build validation: all 25 automated tests passed, including admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
 
 ## Data and map services
 

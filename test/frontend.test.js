@@ -9,7 +9,7 @@ function instance(realRender = false) {
   let definition;
   const timers = new Map();
   let id = 0;
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../MMM-Life360Map.js"), "utf8"), {
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../MMM-Life360-Leaflet.js"), "utf8"), {
     Module: { register(name, value) { definition = value; } },
     setInterval(fn, ms) { timers.set(++id, { fn, ms }); return id; },
     clearInterval(timer) { timers.delete(timer); },

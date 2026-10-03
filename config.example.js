@@ -1,8 +1,8 @@
 // Copy the OBJECT below (without "module.exports =") INSIDE the modules: [ ... ]
 // array in MagicMirror/config/config.js. The README contains a paste-ready snippet.
-// The access token belongs in ~/.config/MMM-Life360Map/credentials.json, NOT here.
+// The access token belongs in ~/.config/MMM-Life360-Leaflet/credentials.json, NOT here.
 module.exports = {
-  module: "MMM-Life360Map",
+  module: "MMM-Life360-Leaflet",
   position: "top_right",
   config: {
     circleId: "PASTE_YOUR_CIRCLE_ID",
