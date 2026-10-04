@@ -201,7 +201,23 @@ memberAliases: {
 },
 ```
 
-Use each person's member `id` from the `members` array in the circle members API response (visible under Developer Tools → Network → the `/circles/YOUR-CIRCLE-ID/members` request → Preview/Response). This is a member ID, not the circle ID. Match the ID to the member's name before copying it. Names with no matching alias, blank aliases, or non-string aliases retain their Life360 name. Aliases are displayed as plain text and do not change the Life360 account. Restart MagicMirror after changing configuration.
+To find member IDs, restart MagicMirror and wait for the first successful Life360 refresh. The module writes each member's Life360 name and ID to the **MagicMirror server log**:
+
+```text
+[MMM-Life360-Leaflet] Member name="Alex Rivera" memberId="EXAMPLE_MEMBER_ID"
+```
+
+If you use PM2, run `pm2 list` to find the MagicMirror process name, then run:
+
+```bash
+pm2 logs YOUR_PROCESS_NAME --lines 200
+```
+
+If you start MagicMirror manually, look in the terminal where you started it. For a systemd service, use `journalctl -u YOUR_SERVICE_NAME -n 200` with your actual service name. These are server logs, not the browser developer console.
+
+Copy the `memberId` value (without the surrounding quotation marks) for the matching person and use it as a key in `memberAliases`. The log shows the original Life360 name even when a card has an alias. Entries appear once per member/circle after each server restart, and again if a member's name changes, rather than on every poll. No member entries appear until a successful fetch. These log lines contain personal names and IDs; redact them before sharing logs.
+
+This is a member ID, not the circle ID. Names with no matching alias, blank aliases, or non-string aliases retain their Life360 name. Aliases are displayed as plain text and do not change the Life360 account. Restart MagicMirror after changing configuration.
 
 ## Custom colors
 
@@ -270,7 +286,7 @@ Open `http://127.0.0.1:8765/demo/` in a browser. It needs internet for map tiles
 
 Run the included backend and lifecycle tests with `npm test` or `node --test test/*.test.js`. Tests use synthetic data; no account credentials or live Life360 API calls are needed. The standalone demo checks the same frontend used by the module; it is not a full MagicMirror-on-Pi integration test.
 
-Build validation: all 26 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
+Build validation: all 27 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
 
 ## Data and map services
 

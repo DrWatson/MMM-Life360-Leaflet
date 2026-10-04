@@ -1,6 +1,6 @@
 {
   "name": "mmm-life360-leaflet",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "private": true,
   "description": "Life360 circle map for MagicMirror2",
   "license": "MIT",
