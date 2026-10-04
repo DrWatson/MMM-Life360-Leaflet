@@ -139,6 +139,7 @@ Treat this token like a password: it can grant access to your circle's informati
 | --- | --- | --- |
 | `circleId` | empty | Required Life360 circle ID |
 | `title` | `Our circle` | Heading |
+| `memberAliases` | `{}` | Custom card names keyed by Life360 member ID. Applies to member cards and popup cards, including avatar initials and accessibility labels. Map marker names retain the Life360 name. |
 | `showFamilyHeading` | `true` | Show “FAMILY LOCATIONS” above the title |
 | `showSyncStatus` | `true` | Show routine sync/loading text such as “Synced just now”; API error messages remain visible when false |
 | `showRefreshFooter` | `true` | Show the refresh footer (including its last-successful-data text on errors) |
@@ -188,6 +189,19 @@ Separately, `showAdminCrowns: false` hides admin crowns on cards, popups, indivi
 Set `updateInterval: 5000` for a five-second refresh; the caption will show “Refresh every 5s.” The default remains 60 seconds. Values below 5000 are clamped to 5000. Restart MagicMirror after changing configuration.
 
 Polling pauses when MagicMirror hides the module and resumes when it is shown. Requests are deduplicated by circle on the server; multiple viewers do not trigger extra requests within a 5-second window. Rate limits and browser/permission blocks delay retries. The normal refresh interval is not a promise of fresh device data.
+
+## Custom member names
+
+Add `memberAliases` inside the module's `config` object:
+
+```js
+memberAliases: {
+  "MEMBER_ID_1": "Dad",
+  "MEMBER_ID_2": "Mum"
+},
+```
+
+Use each person's member `id` from the `members` array in the circle members API response (visible under Developer Tools → Network → the `/circles/YOUR-CIRCLE-ID/members` request → Preview/Response). This is a member ID, not the circle ID. Match the ID to the member's name before copying it. Names with no matching alias, blank aliases, or non-string aliases retain their Life360 name. Aliases are displayed as plain text and do not change the Life360 account. Restart MagicMirror after changing configuration.
 
 ## Custom colors
 
@@ -256,7 +270,7 @@ Open `http://127.0.0.1:8765/demo/` in a browser. It needs internet for map tiles
 
 Run the included backend and lifecycle tests with `npm test` or `node --test test/*.test.js`. Tests use synthetic data; no account credentials or live Life360 API calls are needed. The standalone demo checks the same frontend used by the module; it is not a full MagicMirror-on-Pi integration test.
 
-Build validation: all 25 automated tests passed, including admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
+Build validation: all 26 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
 
 ## Data and map services
 

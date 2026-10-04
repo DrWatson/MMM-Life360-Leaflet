@@ -199,3 +199,25 @@ test("unchanged members refresh a cached count icon when the avatar limit change
   module.render();
   assert.equal(icon.html, "2");
 });
+
+test("member aliases affect card labels and avatars without changing source names", () => {
+  const { module } = instance();
+  module.el = (tag, className, text) => ({ tag, className, text, style: {}, children: [],
+    append(...children) { this.children.push(...children); },
+    setAttribute(name, value) { this[name] = value; }, addEventListener() {} });
+  module.avatar = member => ({ name: member.name });
+  const member = { id: "person-1", name: "Original Name", latitude: null, longitude: null,
+    battery: null, charging: null, updatedAt: null, locationStatus: "Location sharing off" };
+  for (const [aliases, expected] of [[{ "person-1": " Dad " }, "Dad"],
+    [{ "other": "Dad" }, "Original Name"], [{ "person-1": " " }, "Original Name"],
+    [{ "person-1": 42 }, "Original Name"], [null, "Original Name"]]) {
+    module.config.memberAliases = aliases;
+    for (const popup of [false, true]) {
+      const card = module.memberCard(member, popup);
+      assert.equal(card.children[0].name, expected);
+      assert.equal(card.children[1].children[0].text, expected);
+      if (!popup) assert.ok(card["aria-label"].startsWith(expected + ","));
+    }
+    assert.equal(member.name, "Original Name");
+  }
+});

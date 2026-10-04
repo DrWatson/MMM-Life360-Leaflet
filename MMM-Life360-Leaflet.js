@@ -4,6 +4,7 @@ Module.register("MMM-Life360-Leaflet", {
   defaults: {
     circleId: "",
     title: "Our circle",
+    memberAliases: {},
     showFamilyHeading: true,
     showSyncStatus: true,
     showRefreshFooter: true,
@@ -291,6 +292,11 @@ Module.register("MMM-Life360-Leaflet", {
   },
 
   memberCard(member, popup = false) {
+    // Copy the display data so aliases never overwrite the Life360 snapshot.
+    const aliases = this.config.memberAliases;
+    const alias = aliases && typeof aliases === "object" && !Array.isArray(aliases) &&
+      Object.prototype.hasOwnProperty.call(aliases, member.id) ? aliases[member.id] : null;
+    if (typeof alias === "string" && alias.trim()) member = { ...member, name: alias.trim() };
     const hasLocation = member.latitude !== null && member.longitude !== null;
     const card = this.el(popup ? "div" : "button", `l360-member${this.isStale(member) ? " l360-stale" : ""}`);
     if (!popup) {
