@@ -214,6 +214,10 @@ The first successful response establishes a position for each member. Later resp
 
 On the first successful new response after the quiet period expires with no further threshold crossing, polling returns to the general interval. Identical positions (including an unchanged device report) count as no detected movement; this cannot prove a phone has stopped if Life360 has stopped reporting. Errors and cached responses do not change the mode. Missing coordinates are excluded, and returning members get a new baseline. Polling still pauses when the module is hidden, and API backoff/rate limits still apply. The footer displays the currently active interval. Movement can only be detected at the next idle poll, so a longer idle interval increases detection delay.
 
+### Polling logs
+
+The MagicMirror server log records each map-data refresh request and whether data was returned or the refresh failed. A returned snapshot may be cached; the log does not imply a fresh phone GPS report or a map-tile reload. It also records each `movementThreshold` crossing with member name, ID, measured distance and threshold; switches between `updateInterval` and `movingUpdateInterval` with effective intervals; and `movementTimeout` expiry when a successful response ends movement mode. Timeout and switch messages appear once per transition, not on every idle poll. At a one-second interval, refresh messages are frequent. No coordinates or access tokens are logged.
+
 ## Custom member names
 
 Add `memberAliases` inside the module's `config` object:
@@ -310,7 +314,7 @@ Open `http://127.0.0.1:8765/demo/` in a browser. It needs internet for map tiles
 
 Run the included backend and lifecycle tests with `npm test` or `node --test test/*.test.js`. Tests use synthetic data; no account credentials or live Life360 API calls are needed. The standalone demo checks the same frontend used by the module; it is not a full MagicMirror-on-Pi integration test.
 
-Build validation: all 31 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
+Build validation: all 32 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
 
 ## Data and map services
 

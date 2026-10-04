@@ -64,6 +64,7 @@ Module.register("MMM-Life360-Leaflet", {
       this.config.movingUpdateInterval);
     this.movementAnchors = new Map();
     this.lastMovementAt = null;
+    this.movementPollingActive = false;
     this.lastMovementFetch = null;
     this.suspended = false;
     this.beginPolling();
@@ -234,6 +235,7 @@ Module.register("MMM-Life360-Leaflet", {
         Math.sin((lon - anchor[1]) * radians / 2) ** 2;
       const distance = 6371000 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
       if (distance > threshold) {
+        this.logPolling(`movementThreshold exceeded: member=${JSON.stringify(member.name || member.id)} memberId=${JSON.stringify(member.id)}, distance=${distance.toFixed(1)} meters, threshold=${threshold} meters.`);
         moved = true;
         this.movementAnchors.set(member.id, [lat, lon]);
       }
@@ -243,10 +245,22 @@ Module.register("MMM-Life360-Leaflet", {
     const active = present.size > 0 && this.lastMovementAt !== null &&
       payload.fetchedAt - this.lastMovementAt < timeout;
     const next = active ? this.movingRefreshMs : this.idleRefreshMs;
+    if (this.movementPollingActive && !active && this.lastMovementAt !== null &&
+        payload.fetchedAt - this.lastMovementAt >= timeout) {
+      this.logPolling(`movementTimeout reached/exceeded: ${payload.fetchedAt - this.lastMovementAt} ms since last threshold crossing (limit=${timeout} ms).`);
+    }
+    if (active !== this.movementPollingActive) {
+      this.logPolling(`Polling switched from ${this.movementPollingActive ? "movingUpdateInterval" : "updateInterval"} (${this.refreshMs} ms) to ${active ? "movingUpdateInterval" : "updateInterval"} (${next} ms).`);
+      this.movementPollingActive = active;
+    }
     if (next === this.refreshMs) return;
     this.refreshMs = next;
     clearInterval(this.pollTimer);
     if (!this.suspended) this.pollTimer = setInterval(() => this.requestMembers(), this.refreshMs);
+  },
+
+  logPolling(message) {
+    this.sendSocketNotification("L360_POLLING_LOG", { identifier: this.identifier, message });
   },
 
   el(tag, className = "", text) {

@@ -8,7 +8,7 @@ const path = require("node:path");
 test("helper logs member IDs once, repeats renamed members, and skips failed results", async () => {
   const logs = [];
   let result = { members: [{ id: "member-1", name: "Alex\nRivera" }] };
-  const context = { module: { exports: {} }, console: { log: line => logs.push(line) },
+  const context = { module: { exports: {} }, console: { log: line => { if (line.includes("Member name=")) logs.push(line); } },
     require: name => name === "node_helper" ? { create: value => value } :
       { CirclePoller: class { async poll() { return result; } } } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../node_helper.js"), "utf8"), context);

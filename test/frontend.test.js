@@ -286,3 +286,21 @@ test("polling settings clamp below-minimum values and send server log notices", 
   module.start();
   assert.equal(module.sent.filter(x => x.notification === "L360_CONFIG_MINIMUM").length, 0);
 });
+
+test("movement diagnostics report threshold, both switches and timeout only once", () => {
+  const { module } = instance();
+  module.start();
+  const send = (fetchedAt, latitude) => module.updateMovementPolling({ fetchedAt,
+    members: [{ id: "a", name: "Alex", latitude, longitude: 0 }] });
+  send(1, 0);
+  send(60001, 0.001);
+  send(65001, 0.001);
+  send(180001, 0.001);
+  send(240001, 0.001);
+  const logs = module.sent.filter(x => x.notification === "L360_POLLING_LOG").map(x => x.payload.message);
+  assert.equal(logs.length, 4);
+  assert.match(logs[0], /movementThreshold exceeded/);
+  assert.match(logs[1], /from updateInterval .* to movingUpdateInterval/);
+  assert.match(logs[2], /movementTimeout reached\/exceeded/);
+  assert.match(logs[3], /from movingUpdateInterval .* to updateInterval/);
+});
