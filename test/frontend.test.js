@@ -265,3 +265,24 @@ test("movement respects threshold, any member, cached timestamps, missing positi
   send(4000, null);
   assert.equal(module.movementAnchors.has("moving"), false);
 });
+
+test("polling settings clamp below-minimum values and send server log notices", () => {
+  for (const input of [0, -1, 0.5]) {
+    const { module, timers } = instance();
+    const limits = { updateInterval: 5000, movingUpdateInterval: 1000,
+      movementThreshold: 10, movementTimeout: 60000 };
+    for (const key of Object.keys(limits)) module.config[key] = input;
+    module.start();
+    for (const [key, minimum] of Object.entries(limits)) assert.equal(module.config[key], minimum);
+    assert.equal(module.sent.filter(x => x.notification === "L360_CONFIG_MINIMUM").length, 4);
+    module.updateMovementPolling({ fetchedAt: 1, members: [{ id: "a", latitude: 0, longitude: 0 }] });
+    module.updateMovementPolling({ fetchedAt: 5001, members: [{ id: "a", latitude: 0.001, longitude: 0 }] });
+    assert.equal(timers.get(module.pollTimer).ms, 1000);
+    module.updateMovementPolling({ fetchedAt: 65001, members: [{ id: "a", latitude: 0.001, longitude: 0 }] });
+    assert.equal(module.refreshMs, 5000);
+  }
+  const { module } = instance();
+  Object.assign(module.config, { updateInterval: 5000, movingUpdateInterval: 1000, movementThreshold: 10, movementTimeout: 60000 });
+  module.start();
+  assert.equal(module.sent.filter(x => x.notification === "L360_CONFIG_MINIMUM").length, 0);
+});

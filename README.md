@@ -148,9 +148,9 @@ Treat this token like a password: it can grant access to your circle's informati
 | `showAdminCrowns` | `true` | Show admin crowns on cards, popups, individual map avatars, and grouped map avatars. Set `false` to hide all crowns. Numbered group markers never show crowns. |
 | `speedUnits` | `mph` | Driving speed units: `mph` or `kmh` (displayed as km/h). `km/h` and `kph` are also accepted. |
 | `updateInterval` | `60000` | General/idle API polling interval in milliseconds; minimum 5 seconds (`5000`). Existing configs keep this as their idle interval. |
-| `movingUpdateInterval` | `5000` | Polling interval while movement is detected, in milliseconds. Minimum 5000; capped at `updateInterval` so movement never slows polling. |
-| `movementThreshold` | `50` | Displacement in meters that any member must exceed to trigger or prolong movement polling. Must be positive. |
-| `movementTimeout` | `120000` | Quiet period in milliseconds before returning to idle polling, measured since the last threshold crossing. Must be positive. |
+| `movingUpdateInterval` | `5000` | Polling interval while movement is detected, in milliseconds. Minimum 1000; capped at `updateInterval` so movement never slows polling. |
+| `movementThreshold` | `50` | Displacement in meters that any member must exceed to trigger or prolong movement polling. Minimum 10 meters. |
+| `movementTimeout` | `120000` | Quiet period in milliseconds before returning to idle polling, measured since the last threshold crossing. Minimum 60000 ms (60 seconds). |
 | `width` | `520px` | Module width, a CSS length |
 | `mapWidth` | empty | Map width, e.g. `500px` or `60%`. Left/right cards fill the remaining module width minus the 12px gap. Above/below cards retain the full module width and their existing columns. Empty preserves automatic sizing. For left/right layouts, leave enough room for the cards and gap. |
 | `mapHeight` | `350px` | Map height, a CSS length |
@@ -191,9 +191,17 @@ Separately, `showAdminCrowns: false` hides admin crowns on cards, popups, indivi
 
 Set `updateInterval: 5000` for a five-second refresh; the caption will show “Refresh every 5s.” The default remains 60 seconds. Values below 5000 are clamped to 5000. Restart MagicMirror after changing configuration.
 
-Polling pauses when MagicMirror hides the module and resumes when it is shown. Requests are deduplicated by circle on the server; multiple viewers do not trigger extra requests within a 5-second window. Rate limits and browser/permission blocks delay retries. The normal refresh interval is not a promise of fresh device data.
+Polling pauses when MagicMirror hides the module and resumes when it is shown. Requests are deduplicated by circle on the server; multiple viewers do not trigger extra requests within a 1-second window. Rate limits and browser/permission blocks delay retries. The normal refresh interval is not a promise of fresh device data.
 
 ## Movement-aware polling
+
+The minimum values are `updateInterval: 5000` ms, `movingUpdateInterval: 1000` ms, `movementThreshold: 10` meters, and `movementTimeout: 60000` ms (60 seconds). A numeric value below its minimum, including zero or a negative value, is replaced with that minimum. Each correction writes a warning to the MagicMirror server log at module startup, naming the setting, supplied value, and value used instead. For example:
+
+```text
+[MMM-Life360-Leaflet] movingUpdateInterval=500 ms is below minimum; using 1000 ms instead.
+```
+
+Omitted settings use their defaults; nonnumeric or nonfinite values also fall back to defaults. The movement interval is additionally capped at the general interval. Rate-limit backoff still overrides polling frequency.
 
 ```js
 updateInterval: 60000,       // Check once a minute when idle.
@@ -302,7 +310,7 @@ Open `http://127.0.0.1:8765/demo/` in a browser. It needs internet for map tiles
 
 Run the included backend and lifecycle tests with `npm test` or `node --test test/*.test.js`. Tests use synthetic data; no account credentials or live Life360 API calls are needed. The standalone demo checks the same frontend used by the module; it is not a full MagicMirror-on-Pi integration test.
 
-Build validation: all 29 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
+Build validation: all 31 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
 
 ## Data and map services
 

@@ -144,7 +144,7 @@ test("request uses the right path and bearer header without leaking token to out
   await assert.rejects(fetchMembers("../bad", "token", request), /circleId/);
 });
 
-test("poller prevents simultaneous fetches and permits the next request after 5 seconds", async () => {
+test("poller prevents simultaneous fetches and permits the next request after 1 second", async () => {
   let now = 100000, calls = 0, release;
   const poller = new CirclePoller({ now: () => now, loadToken: async () => "test-token",
     fetch: async () => { calls++; return new Promise(resolve => { release = resolve; }); } });
@@ -154,7 +154,7 @@ test("poller prevents simultaneous fetches and permits the next request after 5 
   assert.equal(calls, 1);
   release([normalizeMember(member())]);
   assert.deepEqual(await first, await second);
-  now += 4999;
+  now += 999;
   await poller.poll("circle-1");
   assert.equal(calls, 1);
   now += 1;

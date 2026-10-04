@@ -29,3 +29,17 @@ test("helper logs member IDs once, repeats renamed members, and skips failed res
   await fetch();
   assert.equal(logs.length, 2);
 });
+
+test("helper writes minimum adjustments to the server log", async () => {
+  const warnings = [];
+  const context = { module: { exports: {} }, console: { warn: text => warnings.push(text) },
+    require: name => name === "node_helper" ? { create: value => value } : {} };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../node_helper.js"), "utf8"), context);
+  const helper = context.module.exports;
+  for (const [setting, minimum] of Object.entries({ updateInterval: 5000, movingUpdateInterval: 1000, movementThreshold: 10, movementTimeout: 60000 })) {
+    await helper.socketNotificationReceived("L360_CONFIG_MINIMUM", { setting, value: 0 });
+    assert.ok(warnings.at(-1).includes(`${setting}=0`));
+    assert.ok(warnings.at(-1).includes(`using ${minimum}`));
+  }
+  assert.equal(warnings.length, 4);
+});

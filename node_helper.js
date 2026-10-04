@@ -9,6 +9,16 @@ module.exports = NodeHelper.create({
     this.loggedMembers = new Map();
   },
   async socketNotificationReceived(notification, payload) {
+    if (notification === "L360_CONFIG_MINIMUM") {
+      const limits = { updateInterval: [5000, "ms"], movingUpdateInterval: [1000, "ms"],
+        movementThreshold: [10, "meters"], movementTimeout: [60000, "ms"] };
+      if (payload && Object.prototype.hasOwnProperty.call(limits, payload.setting) &&
+          Number.isFinite(payload.value)) {
+        const [minimum, unit] = limits[payload.setting];
+        if (payload.value < minimum) console.warn(`[MMM-Life360-Leaflet] ${payload.setting}=${payload.value} ${unit} is below minimum; using ${minimum} ${unit} instead.`);
+      }
+      return;
+    }
     if (notification !== "L360_FETCH" || !payload ||
         typeof payload.identifier !== "string" || typeof payload.circleId !== "string") return;
     const result = await this.poller.poll(payload.circleId);

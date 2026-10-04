@@ -49,10 +49,19 @@ Module.register("MMM-Life360-Leaflet", {
     this.fetchedAt = null;
     this.error = null;
     this.markers = new Map();
-    this.refreshMs = Math.max(5000, Number(this.config.updateInterval) || 60000);
+    for (const [setting, minimum] of Object.entries({ updateInterval: 5000,
+      movingUpdateInterval: 1000, movementThreshold: 10, movementTimeout: 60000 })) {
+      const supplied = Number(this.config[setting]);
+      if (Number.isFinite(supplied) && supplied < minimum) {
+        this.sendSocketNotification("L360_CONFIG_MINIMUM", { setting, value: supplied });
+      }
+      this.config[setting] = Number.isFinite(supplied)
+        ? Math.max(minimum, supplied) : this.defaults[setting];
+    }
+    this.refreshMs = this.config.updateInterval;
     this.idleRefreshMs = this.refreshMs;
     this.movingRefreshMs = Math.min(this.idleRefreshMs,
-      Math.max(5000, Number(this.config.movingUpdateInterval) || 5000));
+      this.config.movingUpdateInterval);
     this.movementAnchors = new Map();
     this.lastMovementAt = null;
     this.lastMovementFetch = null;
@@ -209,8 +218,8 @@ Module.register("MMM-Life360-Leaflet", {
     // Only successful new server snapshots count, not timer renders or cached replies.
     if (!Number.isFinite(payload.fetchedAt) || payload.fetchedAt <= (this.lastMovementFetch ?? -Infinity)) return;
     this.lastMovementFetch = payload.fetchedAt;
-    const threshold = Number(this.config.movementThreshold) > 0 ? Number(this.config.movementThreshold) : 50;
-    const timeout = Number(this.config.movementTimeout) > 0 ? Number(this.config.movementTimeout) : 120000;
+    const threshold = this.config.movementThreshold;
+    const timeout = this.config.movementTimeout;
     const present = new Set();
     let moved = false;
     for (const member of payload.members) {
