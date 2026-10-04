@@ -139,6 +139,7 @@ Treat this token like a password: it can grant access to your circle's informati
 | --- | --- | --- |
 | `circleId` | empty | Required Life360 circle ID |
 | `title` | `Our circle` | Heading |
+| `debugLogging` | `false` | Set to boolean `true` to log movement threshold crossings, timeout expiry, and interval switches. Below-minimum warnings, member-ID logs, and refresh logs remain enabled regardless of this setting. |
 | `memberAliases` | `{}` | Custom card names keyed by Life360 member ID. Applies to member cards and popup cards, including avatar initials and accessibility labels. Map marker names retain the Life360 name. |
 | `showFamilyHeading` | `true` | Show “FAMILY LOCATIONS” above the title |
 | `showSyncStatus` | `true` | Show routine sync/loading text such as “Synced just now”; API error messages remain visible when false |
@@ -195,7 +196,7 @@ Polling pauses when MagicMirror hides the module and resumes when it is shown. R
 
 ## Movement-aware polling
 
-The minimum values are `updateInterval: 5000` ms, `movingUpdateInterval: 1000` ms, `movementThreshold: 10` meters, and `movementTimeout: 60000` ms (60 seconds). A numeric value below its minimum, including zero or a negative value, is replaced with that minimum. Each correction writes a warning to the MagicMirror server log at module startup, naming the setting, supplied value, and value used instead. For example:
+The minimum values are `updateInterval: 5000` ms, `movingUpdateInterval: 1000` ms, `movementThreshold: 10` meters, and `movementTimeout: 60000` ms (60 seconds). A numeric value below its minimum, including zero or a negative value, is replaced with that minimum. Each correction always writes a warning, regardless of `debugLogging`, to the MagicMirror server log at module startup, naming the setting, supplied value, and value used instead. For example:
 
 ```text
 [MMM-Life360-Leaflet] movingUpdateInterval=500 ms is below minimum; using 1000 ms instead.
@@ -216,7 +217,9 @@ On the first successful new response after the quiet period expires with no furt
 
 ### Polling logs
 
-The MagicMirror server log records each map-data refresh request and whether data was returned or the refresh failed. A returned snapshot may be cached; the log does not imply a fresh phone GPS report or a map-tile reload. It also records each `movementThreshold` crossing with member name, ID, measured distance and threshold; switches between `updateInterval` and `movingUpdateInterval` with effective intervals; and `movementTimeout` expiry when a successful response ends movement mode. Timeout and switch messages appear once per transition, not on every idle poll. At a one-second interval, refresh messages are frequent. No coordinates or access tokens are logged.
+Set `debugLogging: true` inside the module config to enable movement and interval diagnostics; the default is `false`. Use a boolean, not a quoted string. Minimum values are enforced and below-minimum warnings are always logged regardless of this setting. Restart MagicMirror after changing the setting.
+
+The MagicMirror server log records each map-data refresh request and whether data was returned or the refresh failed. A returned snapshot may be cached; the log does not imply a fresh phone GPS report or a map-tile reload. With `debugLogging: true`, it also records each `movementThreshold` crossing with member name, ID, measured distance and threshold; switches between `updateInterval` and `movingUpdateInterval` with effective intervals; and `movementTimeout` expiry when a successful response ends movement mode. Timeout and switch messages appear once per transition, not on every idle poll. At a one-second interval, refresh messages are frequent. No coordinates or access tokens are logged.
 
 ## Custom member names
 
@@ -314,7 +317,7 @@ Open `http://127.0.0.1:8765/demo/` in a browser. It needs internet for map tiles
 
 Run the included backend and lifecycle tests with `npm test` or `node --test test/*.test.js`. Tests use synthetic data; no account credentials or live Life360 API calls are needed. The standalone demo checks the same frontend used by the module; it is not a full MagicMirror-on-Pi integration test.
 
-Build validation: all 32 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
+Build validation: all 34 automated tests passed, including member aliases, admin crowns, movement flags, speed conversion, five-second polling, caption rendering, server request throttling, and configurable avatar/count thresholds. Browser checks verified cached-count recovery when the avatar limit changes, non-overlapping grouped avatars, and individual SVG admin crowns, grouped avatar crowns, mph/km/h display, and three colocated avatars changing to a single count of four, then returning to three avatars when the group shrinks. Earlier browser checks covered all four card layouts, member-card popups, connection errors, sharing-off states, and recovery. No browser warnings or errors were observed during those checks. A real account, token, Raspberry Pi, and full MagicMirror process were not available for live integration testing.
 
 ## Data and map services
 

@@ -10,7 +10,7 @@ module.exports = NodeHelper.create({
   },
   async socketNotificationReceived(notification, payload) {
     if (notification === "L360_POLLING_LOG") {
-      if (payload && typeof payload.message === "string") {
+      if (payload && payload.debugLogging === true && typeof payload.message === "string") {
         console.log(`[MMM-Life360-Leaflet] instance=${JSON.stringify(payload.identifier)} ${payload.message.replace(/[\r\n]/g, " ")}`);
       }
       return;

@@ -37,9 +37,23 @@ test("helper writes minimum adjustments to the server log", async () => {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../node_helper.js"), "utf8"), context);
   const helper = context.module.exports;
   for (const [setting, minimum] of Object.entries({ updateInterval: 5000, movingUpdateInterval: 1000, movementThreshold: 10, movementTimeout: 60000 })) {
-    await helper.socketNotificationReceived("L360_CONFIG_MINIMUM", { setting, value: 0 });
+    await helper.socketNotificationReceived("L360_CONFIG_MINIMUM", { setting, value: 0, debugLogging: true });
     assert.ok(warnings.at(-1).includes(`${setting}=0`));
     assert.ok(warnings.at(-1).includes(`using ${minimum}`));
   }
   assert.equal(warnings.length, 4);
+});
+
+test("helper suppresses debug notifications unless explicitly enabled", async () => {
+  const logs = [];
+  const context = { module: { exports: {} }, console: { log: x => logs.push(x), warn: x => logs.push(x) },
+    require: name => name === "node_helper" ? { create: value => value } : {} };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../node_helper.js"), "utf8"), context);
+  for (const debugLogging of [false, undefined, "true"]) {
+    await context.module.exports.socketNotificationReceived("L360_CONFIG_MINIMUM", { setting: "updateInterval", value: 1, debugLogging });
+    await context.module.exports.socketNotificationReceived("L360_POLLING_LOG", { message: "movementTimeout", debugLogging });
+  }
+  assert.equal(logs.length, 3);
+  await context.module.exports.socketNotificationReceived("L360_POLLING_LOG", { message: "movementTimeout", debugLogging: true });
+  assert.equal(logs.length, 4);
 });

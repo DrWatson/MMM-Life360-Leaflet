@@ -5,6 +5,7 @@ Module.register("MMM-Life360-Leaflet", {
     circleId: "",
     title: "Our circle",
     memberAliases: {},
+    debugLogging: false,
     showFamilyHeading: true,
     showSyncStatus: true,
     showRefreshFooter: true,
@@ -260,7 +261,8 @@ Module.register("MMM-Life360-Leaflet", {
   },
 
   logPolling(message) {
-    this.sendSocketNotification("L360_POLLING_LOG", { identifier: this.identifier, message });
+    if (this.config.debugLogging !== true) return;
+    this.sendSocketNotification("L360_POLLING_LOG", { identifier: this.identifier, message, debugLogging: true });
   },
 
   el(tag, className = "", text) {

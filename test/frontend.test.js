@@ -271,7 +271,7 @@ test("polling settings clamp below-minimum values and send server log notices", 
     const { module, timers } = instance();
     const limits = { updateInterval: 5000, movingUpdateInterval: 1000,
       movementThreshold: 10, movementTimeout: 60000 };
-    for (const key of Object.keys(limits)) module.config[key] = input;
+    module.config.debugLogging = true; for (const key of Object.keys(limits)) module.config[key] = input;
     module.start();
     for (const [key, minimum] of Object.entries(limits)) assert.equal(module.config[key], minimum);
     assert.equal(module.sent.filter(x => x.notification === "L360_CONFIG_MINIMUM").length, 4);
@@ -290,7 +290,7 @@ test("polling settings clamp below-minimum values and send server log notices", 
 test("movement diagnostics report threshold, both switches and timeout only once", () => {
   const { module } = instance();
   module.start();
-  const send = (fetchedAt, latitude) => module.updateMovementPolling({ fetchedAt,
+  module.config.debugLogging = true; const send = (fetchedAt, latitude) => module.updateMovementPolling({ fetchedAt,
     members: [{ id: "a", name: "Alex", latitude, longitude: 0 }] });
   send(1, 0);
   send(60001, 0.001);
@@ -303,4 +303,16 @@ test("movement diagnostics report threshold, both switches and timeout only once
   assert.match(logs[1], /from updateInterval .* to movingUpdateInterval/);
   assert.match(logs[2], /movementTimeout reached\/exceeded/);
   assert.match(logs[3], /from movingUpdateInterval .* to updateInterval/);
+});
+
+test("debug logging is opt-in and does not prevent minimum enforcement", () => {
+  for (const value of [false, undefined, "true"]) {
+    const { module } = instance();
+    module.config.debugLogging = value;
+    module.config.updateInterval = 1;
+    module.start();
+    module.logPolling("movementThreshold exceeded");
+    assert.equal(module.refreshMs, 5000);
+    assert.equal(module.sent.filter(x => x.notification === "L360_CONFIG_MINIMUM").length, 1); assert.equal(module.sent.some(x => x.notification === "L360_POLLING_LOG"), false);
+  }
 });
