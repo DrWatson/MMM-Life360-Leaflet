@@ -18,10 +18,10 @@
 .l360-tile-warning { position: absolute; z-index: 500; bottom: 25px; left: 12px; right: 12px; padding: 8px; background: #29200fe8; color: #ffe0a4; font-size: 11px; border-radius: 6px; pointer-events: none; }
 .l360 .leaflet-control-attribution { font-size: 10px; background: #fffffff0; color: #222; }
 .l360 .leaflet-control-attribution a { color: #155a74; }
-.l360 .leaflet-control-zoom a { background: #162322; color: #eaf6ef; border-color: #40544d; }
+.l360 .leaflet-control-zoom a { background: var(--l360-zoom-background, #162322); color: var(--l360-zoom-text, #eaf6ef); border-color: #40544d; }
 .l360-members { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; }
 .l360-cards-left > .l360-members, .l360-cards-right > .l360-members { grid-template-columns: minmax(0, 1fr); }
-.l360-member { display: flex; gap: 11px; align-items: flex-start; width: 100%; min-width: 0; margin: 0; padding: 13px 11px; border: 1px solid #263630; border-radius: 11px; background: #101a17; color: #eef5f1; font: inherit; text-align: left; cursor: pointer; }
+.l360-member { display: flex; gap: 11px; align-items: flex-start; width: 100%; min-width: 0; margin: 0; padding: 13px 11px; border: 1px solid #263630; border-radius: 11px; background: var(--l360-card-background, #101a17); color: #eef5f1; font: inherit; text-align: left; cursor: pointer; }
 .l360-member:hover:not(:disabled), .l360-member:focus-visible { background: #192922; border-color: #92cbb5; outline: none; }
 .l360-member:disabled { cursor: default; opacity: 1; }
 .l360-member-text { flex: 1; min-width: 0; }
@@ -50,8 +50,8 @@
 .l360-cluster-avatars { background: transparent; border: 0; }
 .l360-avatar-group { display: grid; grid-auto-rows: 46px; gap: 16px 4px; width: 100%; height: 100%; }
 .l360-avatar-group > .l360-avatar { margin: 0; width: 46px; height: 46px; min-width: 46px; border-width: 3px; box-shadow: 0 3px 12px #0009; }
-.l360-popup .leaflet-popup-content-wrapper, .l360-popup .leaflet-popup-tip { background: #101a17; color: #eef5f1; }
+.l360-popup .leaflet-popup-content-wrapper, .l360-popup .leaflet-popup-tip { background: var(--l360-card-background, #101a17); color: #eef5f1; }
 .l360-popup .leaflet-popup-content { margin: 8px; }
 .l360-popup .l360-member { border: 0; padding: 8px; cursor: default; }
-.l360-popup .l360-member:hover { background: #101a17; }
+.l360-popup .l360-member:hover { background: var(--l360-card-background, #101a17); }
 @media (max-width: 550px) { .l360-members { grid-template-columns: 1fr; } }
