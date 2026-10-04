@@ -17,6 +17,9 @@ module.exports = {
     cardsPosition: "below", // "below", "above", "left", or "right"
     maxAvatarsPerCluster: 3, // Up to 3 avatars together; larger groups show a count.
     speedUnits: "mph", // "mph" or "kmh"
+    cardBackgroundColor: "#101a17",
+    zoomButtonBackgroundColor: "#162322",
+    zoomButtonTextColor: "#eaf6ef",
     width: "520px",
     mapWidth: "", // e.g. "320px"; empty preserves automatic sizing.
     mapHeight: "350px"

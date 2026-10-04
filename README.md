@@ -150,7 +150,7 @@ Treat this token like a password: it can grant access to your circle's informati
 | `width` | `520px` | Module width, a CSS length |
 | `mapWidth` | empty | Map width, e.g. `500px` or `60%`. Left/right cards fill the remaining module width minus the 12px gap. Above/below cards retain the full module width and their existing columns. Empty preserves automatic sizing. For left/right layouts, leave enough room for the cards and gap. |
 | `mapHeight` | `350px` | Map height, a CSS length |
-| `cardBackgroundColor` | `#101a17` | Member card background, including popup cards. The existing hover/focus highlight remains `#192922`. |
+| `cardBackgroundColor` | `#101a17` | Background for member cards, popup cards, numbered group markers, and grouped avatar backings (visible behind transparent images or initials). The existing hover/focus highlight remains `#192922`. |
 | `zoomButtonBackgroundColor` | `#162322` | Background of both map zoom buttons (+ and −). |
 | `zoomButtonTextColor` | `#eaf6ef` | Color of the + and − symbols. |
 | `cardsPosition` | `below` | Member cards relative to the map: `below`, `above`, `left`, or `right`. Invalid values fall back to `below`. |
