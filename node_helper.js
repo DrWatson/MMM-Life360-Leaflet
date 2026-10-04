@@ -27,9 +27,9 @@ module.exports = NodeHelper.create({
     }
     if (notification !== "L360_FETCH" || !payload ||
         typeof payload.identifier !== "string" || typeof payload.circleId !== "string") return;
-    console.log(`[MMM-Life360-Leaflet] Map refresh requested: instance=${JSON.stringify(payload.identifier)} circleId=${JSON.stringify(payload.circleId)}.`);
+    if (payload.debugLogging === true) console.log(`[MMM-Life360-Leaflet] Map refresh requested: instance=${JSON.stringify(payload.identifier)} circleId=${JSON.stringify(payload.circleId)}.`);
     const result = await this.poller.poll(payload.circleId);
-    console.log(`[MMM-Life360-Leaflet] Map refresh ${result.error ? "failed" : "data ready"}: instance=${JSON.stringify(payload.identifier)}${result.error ? " (retaining last displayed data)" : " (latest available server snapshot)"}.`);
+    if (result.error || payload.debugLogging === true) console.log(`[MMM-Life360-Leaflet] Map refresh ${result.error ? "failed" : "data ready"}: instance=${JSON.stringify(payload.identifier)}${result.error ? " (retaining last displayed data)" : " (latest available server snapshot)"}.`);
     if (!result.error && Array.isArray(result.members)) {
       for (const member of result.members) {
         const key = JSON.stringify([payload.circleId, member.id]);

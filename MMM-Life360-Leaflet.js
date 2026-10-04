@@ -81,7 +81,8 @@ Module.register("MMM-Life360-Leaflet", {
 
   requestMembers() {
     this.sendSocketNotification("L360_FETCH", {
-      identifier: this.identifier, circleId: this.config.circleId
+      identifier: this.identifier, circleId: this.config.circleId,
+      debugLogging: this.config.debugLogging === true
     });
   },
 

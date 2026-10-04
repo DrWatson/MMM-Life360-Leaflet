@@ -7,7 +7,7 @@ module.exports = {
   config: {
     circleId: "PASTE_YOUR_CIRCLE_ID",
     title: "Our circle",
-    debugLogging: false, // Enable movement/interval diagnostics. Minimum-setting warnings always appear.
+    debugLogging: false, // Enable movement/interval and refresh diagnostics. Minimum-setting warnings always appear.
     memberAliases: {}, // e.g. { "MEMBER_ID": "Dad", "OTHER_MEMBER_ID": "Mum" }
     showFamilyHeading: true, // "FAMILY LOCATIONS"
     showSyncStatus: true, // "Synced just now"; errors still appear when false

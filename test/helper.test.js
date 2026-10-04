@@ -57,3 +57,29 @@ test("helper suppresses debug notifications unless explicitly enabled", async ()
   await context.module.exports.socketNotificationReceived("L360_POLLING_LOG", { message: "movementTimeout", debugLogging: true });
   assert.equal(logs.length, 4);
 });
+
+test("refresh requested and data ready require debug; failures always log", async () => {
+  const logs = [];
+  let result = { members: [] };
+  const context = { module: { exports: {} }, console: { log: line => logs.push(line) },
+    require: name => name === "node_helper" ? { create: value => value } :
+      { CirclePoller: class { async poll() { return result; } } } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../node_helper.js"), "utf8"), context);
+  const helper = context.module.exports;
+  helper.start();
+  helper.sendSocketNotification = () => {};
+  for (const debugLogging of [false, undefined, "true", true]) {
+    logs.length = 0;
+    await helper.socketNotificationReceived("L360_FETCH", { identifier: "test", circleId: "circle", debugLogging });
+    assert.equal(logs.length, debugLogging === true ? 2 : 0);
+    if (debugLogging === true) {
+      assert.match(logs[0], /Map refresh requested/);
+      assert.match(logs[1], /Map refresh data ready/);
+    }
+  }
+  logs.length = 0;
+  result = { error: { code: "NETWORK" } };
+  await helper.socketNotificationReceived("L360_FETCH", { identifier: "test", circleId: "circle", debugLogging: false });
+  assert.equal(logs.length, 1);
+  assert.match(logs[0], /Map refresh failed/);
+});
