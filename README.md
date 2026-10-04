@@ -139,7 +139,7 @@ Treat this token like a password: it can grant access to your circle's informati
 | --- | --- | --- |
 | `circleId` | empty | Required Life360 circle ID |
 | `title` | `Our circle` | Heading |
-| `debugLogging` | `false` | Set to boolean `true` to log movement threshold crossings, timeout expiry, interval switches, and refresh-request/data-ready messages. Below-minimum warnings, member-ID logs, and refresh failures remain enabled regardless of this setting. |
+| `debugLogging` | `false` | Enable detailed diagnostic logging. Warnings, refresh failures, and member-identification messages are always logged. See Logging below. |
 | `memberAliases` | `{}` | Custom card names keyed by Life360 member ID. Applies to member cards and popup cards, including avatar initials and accessibility labels. Map marker names retain the Life360 name. |
 | `showFamilyHeading` | `true` | Show “FAMILY LOCATIONS” above the title |
 | `showSyncStatus` | `true` | Show routine sync/loading text such as “Synced just now”; API error messages remain visible when false |
@@ -215,11 +215,20 @@ The first successful response establishes a position for each member. Later resp
 
 On the first successful new response after the quiet period expires with no further threshold crossing, polling returns to the general interval. Identical positions (including an unchanged device report) count as no detected movement; this cannot prove a phone has stopped if Life360 has stopped reporting. Errors and cached responses do not change the mode. Missing coordinates are excluded, and returning members get a new baseline. Polling still pauses when the module is hidden, and API backoff/rate limits still apply. The footer displays the currently active interval. Movement can only be detected at the next idle poll, so a longer idle interval increases detection delay.
 
-### Polling logs
+### Logging
 
-Set `debugLogging: true` inside the module config to enable movement and interval diagnostics; the default is `false`. Use a boolean, not a quoted string. Minimum values are enforced and below-minimum warnings are always logged regardless of this setting. Restart MagicMirror after changing the setting.
+Use `debugLogging` inside the module's `config` object to control diagnostic detail:
 
-With `debugLogging: true`, the MagicMirror server log records each map-data refresh request and when data is ready. Refresh failures are always logged. A returned snapshot may be cached; the log does not imply a fresh phone GPS report or a map-tile reload. With `debugLogging: true`, it also records each `movementThreshold` crossing with member name, ID, measured distance and threshold; switches between `updateInterval` and `movingUpdateInterval` with effective intervals; and `movementTimeout` expiry when a successful response ends movement mode. Timeout and switch messages appear once per transition, not on every idle poll. At a one-second interval, refresh messages are frequent. No coordinates or access tokens are logged.
+```js
+debugLogging: false,
+```
+
+- **Always logged:** configuration warnings, refresh failures, and member names/IDs used to set up aliases.
+- **Debug only (`true`):** routine refresh activity and detailed movement/polling diagnostics. Enable this when troubleshooting; frequent polling can produce many messages.
+
+The default is `false`. Use a boolean (`true` or `false`), not a quoted string, and restart MagicMirror after changing it. This setting only controls logging; polling behavior and configuration minimums are unchanged.
+
+Messages appear in the MagicMirror server logs, not the browser console. Access tokens and GPS coordinates are not logged, but messages can contain member names and IDs; redact personal details before sharing logs. Refresh diagnostics describe the latest available server data, which may be cached, rather than guaranteeing a new phone GPS report.
 
 ## Custom member names
 
