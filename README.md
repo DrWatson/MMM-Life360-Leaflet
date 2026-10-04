@@ -150,6 +150,9 @@ Treat this token like a password: it can grant access to your circle's informati
 | `width` | `520px` | Module width, a CSS length |
 | `mapWidth` | empty | Map width, e.g. `500px` or `60%`. Left/right cards fill the remaining module width minus the 12px gap. Above/below cards retain the full module width and their existing columns. Empty preserves automatic sizing. For left/right layouts, leave enough room for the cards and gap. |
 | `mapHeight` | `350px` | Map height, a CSS length |
+| `cardBackgroundColor` | `#101a17` | Member card background, including popup cards. The existing hover/focus highlight remains `#192922`. |
+| `zoomButtonBackgroundColor` | `#162322` | Background of both map zoom buttons (+ and −). |
+| `zoomButtonTextColor` | `#eaf6ef` | Color of the + and − symbols. |
 | `cardsPosition` | `below` | Member cards relative to the map: `below`, `above`, `left`, or `right`. Invalid values fall back to `below`. |
 | `maxAvatarsPerCluster` | `3` | Maximum group size shown as individual avatars. With `3`, groups of 2 or 3 show all avatars; 4 or more show one count marker. Positive integer; invalid values default to 3, decimals round down. Set 1 for the original count-only clusters. |
 | `staleAfter` | `900000` | Mark location reports older than this many milliseconds |
@@ -185,6 +188,45 @@ Separately, `showAdminCrowns: false` hides admin crowns on cards, popups, indivi
 Set `updateInterval: 5000` for a five-second refresh; the caption will show “Refresh every 5s.” The default remains 60 seconds. Values below 5000 are clamped to 5000. Restart MagicMirror after changing configuration.
 
 Polling pauses when MagicMirror hides the module and resumes when it is shown. Requests are deduplicated by circle on the server; multiple viewers do not trigger extra requests within a 5-second window. Rate limits and browser/permission blocks delay retries. The normal refresh interval is not a promise of fresh device data.
+
+## Custom colors
+
+The three color options accept CSS color names (case-insensitive), hex values such as `"#202020"`, and `rgb()`, `rgba()`, or `hsl()` values. Invalid values fall back to the defaults. Restart MagicMirror after changing configuration. Card text and borders retain their existing colors, so choose backgrounds that keep the text readable.
+
+```js
+cardBackgroundColor: "midnightblue",
+zoomButtonBackgroundColor: "navy",
+zoomButtonTextColor: "white",
+```
+
+The complete set of standard [CSS named colors](https://www.w3.org/TR/css-color-4/#named-colors) is listed below. Use names without spaces. `transparent` is also supported.
+
+```text
+aliceblue antiquewhite aqua aquamarine azure
+beige bisque black blanchedalmond blue blueviolet brown burlywood
+cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan
+darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki
+darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon
+darkseagreen darkslateblue darkslategray darkslategrey darkturquoise
+darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue
+firebrick floralwhite forestgreen fuchsia
+gainsboro ghostwhite gold goldenrod gray green greenyellow grey
+honeydew hotpink indianred indigo ivory khaki
+lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral
+lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink
+lightsalmon lightseagreen lightskyblue lightslategray lightslategrey
+lightsteelblue lightyellow lime limegreen linen
+magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple
+mediumseagreen mediumslateblue mediumspringgreen mediumturquoise
+mediumvioletred midnightblue mintcream mistyrose moccasin
+navajowhite navy oldlace olive olivedrab orange orangered orchid
+palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff
+peru pink plum powderblue purple rebeccapurple red rosybrown royalblue
+saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue
+slateblue slategray slategrey snow springgreen steelblue
+tan teal thistle tomato turquoise violet wheat white whitesmoke
+yellow yellowgreen
+```
 
 ## Troubleshooting
 

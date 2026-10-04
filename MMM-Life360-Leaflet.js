@@ -13,6 +13,9 @@ Module.register("MMM-Life360-Leaflet", {
     updateInterval: 60000,
     width: "520px",
     mapWidth: "",
+    cardBackgroundColor: "#101a17",
+    zoomButtonBackgroundColor: "#162322",
+    zoomButtonTextColor: "#eaf6ef",
     mapHeight: "350px",
     cardsPosition: "below",
     maxAvatarsPerCluster: 3,
@@ -76,6 +79,15 @@ Module.register("MMM-Life360-Leaflet", {
     if (this.root) return this.root;
     this.root = this.el("section", "l360");
     this.root.style.width = this.config.width;
+    for (const [option, property] of [
+      ["cardBackgroundColor", "--l360-card-background"],
+      ["zoomButtonBackgroundColor", "--l360-zoom-background"],
+      ["zoomButtonTextColor", "--l360-zoom-text"]
+    ]) {
+      const value = this.config[option];
+      this.root.style.setProperty(property,
+        typeof value === "string" && CSS.supports("color", value) ? value : this.defaults[option]);
+    }
     this.heading = this.el("div", "l360-heading");
     this.titles = this.el("div");
     this.familyHeading = this.el("div", "l360-eyebrow", "FAMILY LOCATIONS");
