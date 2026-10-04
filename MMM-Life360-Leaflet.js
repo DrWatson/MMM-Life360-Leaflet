@@ -12,6 +12,9 @@ Module.register("MMM-Life360-Leaflet", {
     showTitle: true,
     showAdminCrowns: true,
     updateInterval: 60000,
+    movingUpdateInterval: 5000,
+    movementThreshold: 50,
+    movementTimeout: 120000,
     width: "520px",
     mapWidth: "",
     cardBackgroundColor: "#101a17",
@@ -47,6 +50,13 @@ Module.register("MMM-Life360-Leaflet", {
     this.error = null;
     this.markers = new Map();
     this.refreshMs = Math.max(5000, Number(this.config.updateInterval) || 60000);
+    this.idleRefreshMs = this.refreshMs;
+    this.movingRefreshMs = Math.min(this.idleRefreshMs,
+      Math.max(5000, Number(this.config.movingUpdateInterval) || 5000));
+    this.movementAnchors = new Map();
+    this.lastMovementAt = null;
+    this.lastMovementFetch = null;
+    this.suspended = false;
     this.beginPolling();
   },
 
@@ -65,11 +75,13 @@ Module.register("MMM-Life360-Leaflet", {
   },
 
   suspend() {
+    this.suspended = true;
     clearInterval(this.pollTimer);
     clearInterval(this.ageTimer);
   },
 
   resume() {
+    this.suspended = false;
     this.beginPolling();
     if (this.map) this.map.invalidateSize();
     this.render();
@@ -185,11 +197,47 @@ Module.register("MMM-Life360-Leaflet", {
     if (notification !== "L360_RESULT" || payload.identifier !== this.identifier ||
         payload.circleId !== this.config.circleId) return;
     this.error = payload.error || null;
+    if (!this.error && Array.isArray(payload.members)) this.updateMovementPolling(payload);
     if (Array.isArray(payload.members)) {
       this.members = payload.members;
       this.fetchedAt = payload.fetchedAt;
     }
     this.render();
+  },
+
+  updateMovementPolling(payload) {
+    // Only successful new server snapshots count, not timer renders or cached replies.
+    if (!Number.isFinite(payload.fetchedAt) || payload.fetchedAt <= (this.lastMovementFetch ?? -Infinity)) return;
+    this.lastMovementFetch = payload.fetchedAt;
+    const threshold = Number(this.config.movementThreshold) > 0 ? Number(this.config.movementThreshold) : 50;
+    const timeout = Number(this.config.movementTimeout) > 0 ? Number(this.config.movementTimeout) : 120000;
+    const present = new Set();
+    let moved = false;
+    for (const member of payload.members) {
+      const { latitude: lat, longitude: lon } = member;
+      if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) continue;
+      present.add(member.id);
+      const anchor = this.movementAnchors.get(member.id);
+      if (!anchor) { this.movementAnchors.set(member.id, [lat, lon]); continue; }
+      const radians = Math.PI / 180;
+      const a = Math.sin((lat - anchor[0]) * radians / 2) ** 2 +
+        Math.cos(anchor[0] * radians) * Math.cos(lat * radians) *
+        Math.sin((lon - anchor[1]) * radians / 2) ** 2;
+      const distance = 6371000 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
+      if (distance > threshold) {
+        moved = true;
+        this.movementAnchors.set(member.id, [lat, lon]);
+      }
+    }
+    for (const id of this.movementAnchors.keys()) if (!present.has(id)) this.movementAnchors.delete(id);
+    if (moved) this.lastMovementAt = payload.fetchedAt;
+    const active = present.size > 0 && this.lastMovementAt !== null &&
+      payload.fetchedAt - this.lastMovementAt < timeout;
+    const next = active ? this.movingRefreshMs : this.idleRefreshMs;
+    if (next === this.refreshMs) return;
+    this.refreshMs = next;
+    clearInterval(this.pollTimer);
+    if (!this.suspended) this.pollTimer = setInterval(() => this.requestMembers(), this.refreshMs);
   },
 
   el(tag, className = "", text) {

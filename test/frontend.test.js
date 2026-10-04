@@ -221,3 +221,47 @@ test("member aliases affect card labels and avatars without changing source name
     assert.equal(member.name, "Original Name");
   }
 });
+
+test("movement polling accumulates displacement, holds fast mode, and returns to idle", () => {
+  const { module, timers } = instance();
+  module.start();
+  const send = (time, latitude, extra = {}) => module.socketNotificationReceived("L360_RESULT", {
+    identifier: "module-1", circleId: "circle-1", fetchedAt: time,
+    members: [{ id: "one", latitude, longitude: 0 }], ...extra
+  });
+  send(1000, 0);
+  send(61000, 0.0003); // 33m: stays slow.
+  assert.equal(module.refreshMs, 60000);
+  send(121000, 0.0006); // 67m from anchor: switches fast.
+  assert.equal(module.refreshMs, 5000);
+  assert.equal(timers.get(module.pollTimer).ms, 5000);
+  send(126000, 0.0006);
+  assert.equal(module.refreshMs, 5000);
+  send(241000, 0.0006, { error: { code: "NETWORK" } });
+  assert.equal(module.refreshMs, 5000); // Errors are not evidence of stopping.
+  send(241000, 0.0006);
+  assert.equal(module.refreshMs, 60000);
+  assert.equal(timers.size, 2);
+});
+
+test("movement respects threshold, any member, cached timestamps, missing positions, and suspension", () => {
+  const { module, timers } = instance();
+  module.config.movementThreshold = 100;
+  module.config.movingUpdateInterval = 10000;
+  module.start();
+  const send = (time, latitude) => module.updateMovementPolling({ fetchedAt: time,
+    members: [{ id: "still", latitude: 0, longitude: 0 }, { id: "moving", latitude, longitude: 0 }] });
+  send(1000, 0);
+  send(2000, 0.0006);
+  assert.equal(module.refreshMs, 60000);
+  send(2000, 1); // Duplicate fetch ignored.
+  assert.equal(module.refreshMs, 60000);
+  module.suspend();
+  send(3000, 0.0012);
+  assert.equal(module.refreshMs, 10000);
+  assert.equal(timers.size, 0);
+  module.resume();
+  assert.equal(timers.get(module.pollTimer).ms, 10000);
+  send(4000, null);
+  assert.equal(module.movementAnchors.has("moving"), false);
+});

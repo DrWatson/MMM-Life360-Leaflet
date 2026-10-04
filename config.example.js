@@ -15,6 +15,9 @@ module.exports = {
     showTitle: true, // Your configured title
     showAdminCrowns: true, // Set false to hide admin crowns on all avatars.
     updateInterval: 60000,
+    movingUpdateInterval: 5000,
+    movementThreshold: 50, // Meters of displacement needed to trigger fast polling.
+    movementTimeout: 120000, // Return to idle after this long without another threshold crossing.
     cardsPosition: "below", // "below", "above", "left", or "right"
     maxAvatarsPerCluster: 3, // Up to 3 avatars together; larger groups show a count.
     speedUnits: "mph", // "mph" or "kmh"
