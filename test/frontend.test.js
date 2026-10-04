@@ -298,6 +298,11 @@ test("movement diagnostics report threshold, both switches and timeout only once
   send(180001, 0.001);
   send(240001, 0.001);
   const logs = module.sent.filter(x => x.notification === "L360_POLLING_LOG").map(x => x.payload.message);
+  const measurements = logs.filter(line => line.startsWith("Movement measurement:"));
+  assert.equal(measurements.length, 4);
+  assert.match(measurements[0], /delta=111\.2 meters from baseline, movementThreshold=50 meters, exceeded=true/);
+  assert.match(measurements[1], /delta=0\.0 meters.*exceeded=false/);
+  logs.splice(0, logs.length, ...logs.filter(line => !line.startsWith("Movement measurement:")));
   assert.equal(logs.length, 4);
   assert.match(logs[0], /movementThreshold exceeded/);
   assert.match(logs[1], /from updateInterval .* to movingUpdateInterval/);

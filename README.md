@@ -224,7 +224,7 @@ debugLogging: false,
 ```
 
 - **Always logged:** configuration warnings, refresh failures, and member names/IDs used to set up aliases.
-- **Debug only (`true`):** routine refresh activity and detailed movement/polling diagnostics. Enable this when troubleshooting; frequent polling can produce many messages.
+- **Debug only (`true`):** routine refresh activity and detailed movement/polling diagnostics, including each member's measured displacement in meters, configured movement threshold, and whether it was exceeded. Measurements are relative to the saved movement baseline, not necessarily the previous poll; the initial position establishes that baseline without logging a delta. Enable this when troubleshooting; frequent polling can produce many messages.
 
 The default is `false`. Use a boolean (`true` or `false`), not a quoted string, and restart MagicMirror after changing it. This setting only controls logging; polling behavior and configuration minimums are unchanged.
 

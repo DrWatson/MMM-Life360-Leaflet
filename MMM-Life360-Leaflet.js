@@ -236,6 +236,7 @@ Module.register("MMM-Life360-Leaflet", {
         Math.cos(anchor[0] * radians) * Math.cos(lat * radians) *
         Math.sin((lon - anchor[1]) * radians / 2) ** 2;
       const distance = 6371000 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, a))));
+      this.logPolling(`Movement measurement: member=${JSON.stringify(member.name || member.id)} memberId=${JSON.stringify(member.id)}, delta=${distance.toFixed(1)} meters from baseline, movementThreshold=${threshold} meters, exceeded=${distance > threshold}.`);
       if (distance > threshold) {
         this.logPolling(`movementThreshold exceeded: member=${JSON.stringify(member.name || member.id)} memberId=${JSON.stringify(member.id)}, distance=${distance.toFixed(1)} meters, threshold=${threshold} meters.`);
         moved = true;
