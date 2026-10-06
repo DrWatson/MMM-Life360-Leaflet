@@ -1,4 +1,3 @@
-/* global moduleDefinition */
 const demo = Object.assign({}, moduleDefinition);
 demo.identifier = "demo";
 demo.config = { ...demo.defaults, circleId: "sample-circle", width: "100%" };

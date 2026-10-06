@@ -3,8 +3,30 @@
   "version": "1.7.6",
   "private": true,
   "description": "Life360 circle map for MagicMirror2",
+  "keywords": [
+    "MagicMirror",
+    "GPS",
+    "Tracking",
+    "Life360",
+    "Leaflet",
+    "Map"
+  ],
   "license": "MIT",
-  "engines": { "node": ">=18" },
-  "scripts": { "test": "node --test test/*.test.js" },
-  "vendoredLibraries": { "leaflet": "1.9.4", "leaflet.markercluster": "1.5.3" }
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0"
+  },
+  "vendoredLibraries": {
+    "leaflet": "1.9.4",
+    "leaflet.markercluster": "1.5.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0"
+  }
 }

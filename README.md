@@ -102,6 +102,24 @@ Requires a working MagicMirror² installation (module API minimum 2.20.0) and No
 
 4. Restart MagicMirror using your usual method. If PM2 manages it, use `pm2 list` to find its name, then `pm2 restart YOUR_PROCESS_NAME`. If you launch it manually, stop it and run your normal start command again.
 
+## Upgrading
+
+Read [CHANGELOG.md](CHANGELOG.md) before updating. Keep your settings in MagicMirror's `config/config.js` and your token in the private credentials file outside this repository. Neither is replaced by the commands below. Back up any custom edits inside the module directory first.
+
+For a Git installation:
+
+```bash
+cd ~/MagicMirror/modules/MMM-Life360-Leaflet
+git status --short
+git pull --ff-only
+```
+
+If Git reports local changes or refuses the update, preserve your edits and resolve the conflict before continuing; do not force-reset the checkout. Updating all module files together is essential, including JavaScript, CSS, `node_helper.js`, and `lib/`.
+
+For a ZIP installation, stop MagicMirror, move the existing module folder to a backup location outside `MagicMirror/modules`, then extract the new ZIP into `MagicMirror/modules`. Ensure the folder is named `MMM-Life360-Leaflet` without an extra nested directory. Do not overwrite a Git checkout with a ZIP; use Git updates for that installation.
+
+Restart MagicMirror using your normal method (for PM2, run `pm2 restart YOUR_PROCESS_NAME`). Review its logs for configuration warnings or authentication errors. Normal installations do not need `npm install`; bundled browser libraries are included. Contributors who use development tools should run `npm ci` after updating.
+
 ## Get your Life360 access token
 
 Use Chrome or Microsoft Edge on your computer:
@@ -351,6 +369,22 @@ Life360's endpoints and response fields are undocumented and may change or rejec
 - [Community speed conversion factor](https://github.com/pnbruckner/ha-life360/blob/master/custom_components/life360/const.py)
 - [Leaflet](https://leafletjs.com/reference.html) and [MarkerCluster](https://leaflet.github.io/Leaflet.markercluster/)
 - [OpenStreetMap tile policy](https://operations.osmfoundation.org/policies/tiles/)
+
+## Development and maintenance
+
+Normal module use requires no npm dependency installation. For development tooling, use Node.js 20.19+, 22.13+, or 24+ as supported by ESLint (the module's runtime requirement remains Node.js 18+):
+
+```bash
+npm ci
+npm run lint
+npm test
+```
+
+`npm run lint:fix` applies available automatic fixes; review the changes afterward. ESLint checks module, backend, demo, and test JavaScript while excluding bundled `vendor/` files and `node_modules/`.
+
+Record every code, documentation, configuration, test, and dependency change in [CHANGELOG.md](CHANGELOG.md), normally under **Unreleased**. When releasing, move those entries into the matching version section. [AGENTS.md](AGENTS.md) records this requirement for coding assistants.
+
+Dependabot checks npm development dependencies weekly after `.github/dependabot.yml` reaches the repository's default branch. Review and test its pull requests before merging. It does not update the copied Leaflet/MarkerCluster assets: those require manual replacement, license checks, and updates to `vendor/manifest.json` and `package.json`'s `vendoredLibraries` metadata.
 
 ## License
 

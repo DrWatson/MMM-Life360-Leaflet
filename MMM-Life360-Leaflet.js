@@ -1,4 +1,3 @@
-/* global Module, L */
 Module.register("MMM-Life360-Leaflet", {
   requiresVersion: "2.20.0",
   defaults: {
